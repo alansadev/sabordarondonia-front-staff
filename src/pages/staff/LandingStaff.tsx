@@ -16,7 +16,7 @@ export const LandingStaff = () => {
 	const { data: user } = useCurrentUser();
 
 	useEffect(() => {
-		if (!user || !user.role) return;
+		if (!user) return;
 
 		if (user.role === 'ADMIN') {
 			navigate('/admin', { replace: true });
