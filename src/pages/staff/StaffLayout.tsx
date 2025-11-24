@@ -28,7 +28,7 @@ export const StaffLayout = ({ title, children }: StaffLayoutProps) => {
 		} catch {
 			// ignora erro de logout
 		} finally {
-			navigate('/staff/login');
+			navigate('/login');
 		}
 	};
 
@@ -46,8 +46,16 @@ export const StaffLayout = ({ title, children }: StaffLayoutProps) => {
 
 	return (
 		<Box w='100%' minH='100vh' bg='gray.900' py={4}>
-			<Container maxW='960px'>
-				<Flex as='header' align='center' justify='space-between' mb={6}>
+			<Container maxW='600px' px={4}>
+				<Flex
+					as='header'
+					align='center'
+					justify='space-between'
+					mb={6}
+					gap={3}
+					flexDirection={{ base: 'column', sm: 'row' }}
+					alignItems={{ base: 'flex-start', sm: 'center' }}
+				>
 					<Box>
 						<Heading size='md' color='white'>
 							Sabor de Rondônia - Staff
@@ -56,16 +64,22 @@ export const StaffLayout = ({ title, children }: StaffLayoutProps) => {
 							{title}
 						</Text>
 					</Box>
-					<HStack spacing={3}>
-						{user && (
-							<Text fontSize='xs' color='gray.300'>
-								{user.name}
-								{user.role ? ` · ${user.role.toLowerCase()}` : ''}
+					<HStack
+						spacing={3}
+						w='100%'
+						justify={{ base: 'space-between', sm: 'flex-end' }}
+					>
+						<Box flex='1'>
+							{user && (
+								<Text fontSize='xs' color='gray.300' noOfLines={1}>
+									{user.name}
+									{user.role ? ` · ${user.role.toLowerCase()}` : ''}
+								</Text>
+							)}
+							<Text fontSize='xs' color='gray.500'>
+								Rota: {pathname}
 							</Text>
-						)}
-						<Text fontSize='xs' color='gray.500'>
-							Rota: {pathname}
-						</Text>
+						</Box>
 						<Button
 							size='sm'
 							variant='outline'

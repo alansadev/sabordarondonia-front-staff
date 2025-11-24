@@ -30,13 +30,13 @@ function App() {
 				{/* Landing exclusiva para staff */}
 				<Route path='/' element={<LandingStaff />} />
 				{/* Login do staff */}
-				<Route path='/staff/login' element={<StaffLogin />} />
+				<Route path='/login' element={<StaffLogin />} />
 				<Route path='/admin' element={<AdminDashboard />} />
 				<Route path='/cashier' element={<CashierDashboard />} />
 				<Route path='/dispatcher' element={<DispatcherDashboard />} />
 
 				{/* Fallback sempre para login staff */}
-				<Route path='*' element={<Navigate to='/staff/login' />} />
+				<Route path='*' element={<Navigate to='/login' />} />
 			</Routes>
 		</BrowserRouter>
 	);

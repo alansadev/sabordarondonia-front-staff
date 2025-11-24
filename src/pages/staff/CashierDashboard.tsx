@@ -101,9 +101,7 @@ export const CashierDashboard = () => {
 
 	const handleConfirmPayment = async (orderId: string) => {
 		try {
-			await api.patch(`/orders/${orderId}/status`, {
-				status: 'PAID',
-			});
+			await api.patch(`/orders/${orderId}/confirm-payment`);
 			await fetchOrders();
 		} catch (err) {
 			console.error('Erro ao confirmar pagamento', err);

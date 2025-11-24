@@ -102,9 +102,7 @@ export const DispatcherDashboard = () => {
 
 	const handleDispatch = async (orderId: string) => {
 		try {
-			await api.patch(`/orders/${orderId}/status`, {
-				status: 'DELIVERED',
-			});
+			await api.patch(`/orders/${orderId}/dispatch`);
 			await fetchOrders();
 		} catch (err) {
 			console.error('Erro ao concluir entrega', err);
