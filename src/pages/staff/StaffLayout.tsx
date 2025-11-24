@@ -73,7 +73,9 @@ export const StaffLayout = ({ title, children }: StaffLayoutProps) => {
 							{user && (
 								<Text fontSize='xs' color='gray.300' noOfLines={1}>
 									{user.name}
-									{user.role ? ` · ${user.role.toLowerCase()}` : ''}
+									{user.roles && user.roles.length > 0
+										? ` · ${user.roles[0].toLowerCase()}`
+										: ''}
 								</Text>
 							)}
 							<Text fontSize='xs' color='gray.500'>

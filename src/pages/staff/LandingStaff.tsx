@@ -16,13 +16,15 @@ export const LandingStaff = () => {
 	const { data: user } = useCurrentUser();
 
 	useEffect(() => {
-		if (!user) return;
+		if (!user || !user.roles || user.roles.length === 0) return;
 
-		if (user.role === 'ADMIN') {
+		const mainRole = user.roles[0];
+
+		if (mainRole === 'ADMIN') {
 			navigate('/admin', { replace: true });
-		} else if (user.role === 'CASHIER') {
+		} else if (mainRole === 'CASHIER') {
 			navigate('/cashier', { replace: true });
-		} else if (user.role === 'DISPATCHER') {
+		} else if (mainRole === 'DISPATCHER') {
 			navigate('/dispatcher', { replace: true });
 		}
 	}, [user, navigate]);

@@ -5,7 +5,7 @@ export interface CurrentUser {
 	id: string;
 	name: string;
 	email?: string;
-	role?: 'ADMIN' | 'CASHIER' | 'DISPATCHER';
+	roles?: Array<'ADMIN' | 'CASHIER' | 'DISPATCHER'>;
 }
 
 export const useCurrentUser = () => {
