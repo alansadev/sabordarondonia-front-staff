@@ -15,13 +15,6 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 
-interface StaffUser {
-	id: string;
-	name: string;
-	email: string;
-	role: 'ADMIN' | 'CASHIER' | 'DISPATCHER';
-}
-
 export const StaffLogin = () => {
 	const navigate = useNavigate();
 	const [email, setEmail] = useState('');
@@ -35,20 +28,13 @@ export const StaffLogin = () => {
 		setIsLoading(true);
 
 		try {
-			const { data } = await api.post<StaffUser>('/auth/login', {
+			await api.post('/auth/login', {
 				email,
 				password,
 			});
 
-			if (data.role === 'ADMIN') {
-				navigate('/admin');
-			} else if (data.role === 'CASHIER') {
-				navigate('/cashier');
-			} else if (data.role === 'DISPATCHER') {
-				navigate('/dispatcher');
-			} else {
-				navigate('/');
-			}
+			// Após login bem-sucedido, deixa a landing decidir o destino
+			navigate('/', { replace: true });
 		} catch (err) {
 			console.error('Erro no login do staff', err);
 			setError('Credenciais inválidas ou erro ao entrar.');
