@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import {
-	Box,
 	Badge,
-	Container,
 	Heading,
 	Spinner,
 	Text,
 	VStack,
 	HStack,
 	Button,
+	Box,
 } from '@chakra-ui/react';
 import { api } from '../../lib/api';
+import { StaffLayout } from './StaffLayout';
 
 interface OrderItem {
 	product_name: string;
@@ -88,76 +88,74 @@ export const DispatcherDashboard = () => {
 	};
 
 	return (
-		<Box w='100%' minH='100vh' bg='gray.900' py={8}>
-			<Container maxW='800px'>
-				<Heading color='white' mb={6}>
-					Pedidos aguardando entrega
-				</Heading>
+		<StaffLayout title='Despacho - pedidos aguardando entrega'>
+			<Heading color='white' mb={6}>
+				Pedidos aguardando entrega
+			</Heading>
 
-				{error && (
-					<Text color='red.300' mb={4}>
-						{error}
-					</Text>
-				)}
+			{error && (
+				<Text color='red.300' mb={4}>
+					{error}
+				</Text>
+			)}
 
-				{isLoading ? (
-					<HStack justify='center' mt={10}>
-						<Spinner color='green.400' />
-						<Text color='gray.300'>Carregando pedidos...</Text>
-					</HStack>
-				) : orders.length === 0 ? (
-					<Text color='gray.400'>Nenhum pedido aguardando entrega.</Text>
-				) : (
-					<VStack spacing={4} align='stretch'>
-						{orders.map((order) => (
-							<Box
-								key={order.id}
-								bg='gray.800'
-								borderRadius='lg'
-								p={4}
-								borderWidth='1px'
-								borderColor='gray.700'
-							>
-								<HStack justify='space-between' mb={2}>
-									<Text color='white' fontWeight='bold'>
-										Pedido #{order.order_number}
-									</Text>
-									<Badge colorScheme='blue'>Aguardando entrega</Badge>
-								</HStack>
-
-								<Text fontSize='sm' color='gray.300' mb={1}>
-									Cliente: {order.client_name || '-'} (
-									{order.client_phone || '-'})
+			{isLoading ? (
+				<HStack justify='center' mt={10}>
+					<Spinner color='green.400' />
+					<Text color='gray.300'>Carregando pedidos...</Text>
+				</HStack>
+			) : orders.length === 0 ? (
+				<Text color='gray.400'>Nenhum pedido aguardando entrega.</Text>
+			) : (
+				<VStack spacing={4} align='stretch'>
+					{orders.map((order) => (
+						<Box
+							key={order.id}
+							bg='gray.800'
+							borderRadius='lg'
+							p={4}
+							borderWidth='1px'
+							borderColor='gray.700'
+						>
+							<HStack justify='space-between' mb={2}>
+								<Text color='white' fontWeight='bold'>
+									Pedido #{order.order_number}
 								</Text>
+								<Badge colorScheme='blue'>Aguardando entrega</Badge>
+							</HStack>
 
-								<Text fontSize='sm' color='gray.300' mb={1}>
-									Itens:{' '}
-									{order.items
-										.map((i) => `${i.quantity}x ${i.product_name}`)
-										.join(' · ')}
+							<Text fontSize='sm' color='gray.300' mb={1}>
+								Cliente: {order.client_name || '-'} ({order.client_phone || '-'}
+								)
+							</Text>
+
+							<Text fontSize='sm' color='gray.300' mb={1}>
+								Itens:{' '}
+								{order.items
+									.map((i) => `${i.quantity}x ${i.product_name}`)
+									.join(' · ')}
+							</Text>
+
+							<Text fontSize='sm' color='gray.300' mb={1}>
+								Pagamento: {translatePaymentMethod(order.payment_method)}
+							</Text>
+
+							<HStack justify='space-between' mt={3}>
+								<Text fontWeight='bold' color='green.300'>
+									{formatPrice((order.total_amount ?? 0) / 100)}
 								</Text>
-
-								<Text fontSize='sm' color='gray.300' mb={1}>
-									Pagamento: {translatePaymentMethod(order.payment_method)}
-								</Text>
-
-								<HStack justify='space-between' mt={3}>
-									<Text fontWeight='bold' color='green.300'>
-										{formatPrice((order.total_amount ?? 0) / 100)}
-									</Text>
-									<Button
-										size='sm'
-										colorScheme='blue'
-										onClick={() => handleDispatch(order.id)}
-									>
-										Concluir entrega
-									</Button>
-								</HStack>
-							</Box>
-						))}
-					</VStack>
-				)}
-			</Container>
-		</Box>
+								<Button
+									size='sm'
+									colorScheme='blue'
+									onClick={() => handleDispatch(order.id)}
+								>
+									Concluir entrega
+								</Button>
+							</HStack>
+						</Box>
+					))}
+				</VStack>
+			)}
+		</StaffLayout>
 	);
 };
