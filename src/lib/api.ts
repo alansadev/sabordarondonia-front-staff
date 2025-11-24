@@ -7,7 +7,7 @@ export const api = axios.create({
 	headers: {
 		'Content-Type': 'application/json',
 	},
-	withCredentials: true, // Mantenha isso true!
+	withCredentials: true,
 });
 
 api.interceptors.response.use(
