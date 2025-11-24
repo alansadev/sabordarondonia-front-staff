@@ -1,6 +1,6 @@
-# Sabor de Rondônia – Client
+# Sabor de Rondônia – Staff
 
-Frontend do autoatendimento **Sabor de Rondônia**, focado em experiência _mobile first_ para clientes: escolher produtos, montar o carrinho, se identificar e acompanhar pedidos.
+Frontend interno do **Sabor de Rondônia** para equipe (admin, caixa e despacho), focado em acompanhar o fluxo de pedidos após o autoatendimento do cliente.
 
 ## Tecnologias
 
@@ -8,111 +8,56 @@ Frontend do autoatendimento **Sabor de Rondônia**, focado em experiência _mobi
 - **Vite**
 - **Chakra UI** (componentes e layout)
 - **React Router DOM**
-- **Zustand** (estado do carrinho)
 - **Axios** (HTTP, com cookies HttpOnly)
-- **React Query** (fetch/cache de produtos)
+- **React Query** (fetch/cache de dados)
 
-## Funcionalidades principais
+## Rotas principais (Staff)
 
-- **Landing Page**
+- **Landing Staff (`/`)**
 
-  - Apresentação do projeto e fluxo de uso.
-  - Botão "Ver Cardápio" que leva ao menu.
+  - Landing simples explicando o painel de staff.
+  - Botão "Acessar painel do staff" leva para `/staff/login`.
 
-- **Cardápio (`/menu`)**
+- **Login do Staff (`/staff/login`)**
 
-  - Lista de produtos vinda do backend (`GET /products`).
-  - Adição de itens ao carrinho com feedback visual (toast).
-  - Footer fixo com navegação: **Início**, **Pedidos**, **Perfil**.
+  - Autenticação de usuários internos via `POST /auth/login`.
+  - Ao logar, redireciona conforme `role` retornada pela API:
+    - `ADMIN` → `/admin`
+    - `CASHIER` → `/cashier`
+    - `DISPATCHER` → `/dispatcher`
 
-- **Carrinho (`/cart`)**
+- **Painel Admin (`/admin`)**
 
-  - Exibe itens adicionados (nome, preço, quantidade, imagem).
-  - Permite aumentar/diminuir quantidades e remover itens.
-  - Botão "CONTINUAR":
-    - Se estiver logado (`GET /users/me` OK), vai para o **Checkout**.
-    - Se não estiver logado (401), salva `next_path='/checkout'` e redireciona para **Login**.
+  - Visão geral dos fluxos de **Caixa** e **Despacho**.
+  - Links/indicação das rotas `/cashier` e `/dispatcher`.
 
-- **Login do Cliente (`/login`)**
+- **Dashboard Caixa (`/cashier`)**
 
-  - Identificação por **nome** e **telefone/WhatsApp**.
-  - Fluxo:
-    - Tenta `POST /auth/client-login`.
-    - Se 401 (usuário não existe), faz `POST /users/register` e tenta login novamente.
-  - Redirecionamento após login:
-    - Se existir `sessionStorage.next_path`, volta para lá.
-    - Caso contrário, se houver itens no carrinho → `/checkout`, senão → `/menu`.
+  - Lista pedidos com `status=PENDING_PAYMENT` via `GET /orders?status=PENDING_PAYMENT`.
+  - Exibe:
+    - Número do pedido, cliente, telefone.
+    - Itens em formato `2x Nome do Produto`.
+    - Forma de pagamento traduzida (Pix / Dinheiro / Cartão).
+    - Total formatado em reais (centavos vindo do backend).
+  - Ação "Confirmar pagamento" envia `PATCH /orders/:id/status` com `status='PAID'` e recarrega a lista.
 
-- **Checkout (`/checkout`)**
-
-  - Resumo dos itens e total.
-  - Escolha da forma de pagamento: **Pix**, **Cartão**, **Dinheiro**.
-  - Para dinheiro, permite informar valor para troco.
-  - Envio do pedido:
-
-    - `POST /orders` com payload:
-
-      ```json
-      {
-        "clientInfo": { "name": "João da Silva", "phone": "69912345678" },
-        "items": [
-          { "productId": "...", "quantity": 2 }
-        ],
-        "payment_method": "PIX" | "CASH" | "CREDIT_CARD",
-        "change_for": 500
-      }
-      ```
-
-  - Limpa o carrinho ao finalizar e redireciona para **Order Success**.
-
-- **Sucesso do Pedido ([/order-success](http://_vscodecontentref_/3))**
-
-  - Tela full-screen, sem rolagem, com:
-    - Número do pedido formatado: `#0001`, `#0025`, etc.
-    - Total a pagar.
-    - Botão "Voltar ao Cardápio".
-
-- **Perfil (`/profile`)**
-
-  - Exibe nome e telefone do cliente (via `GET /users/me`).
-  - Permite editar e salvar (`PATCH /users/me`).
-  - Botão "Salvar dados" só habilita quando há alterações.
-  - Botão "Sair da conta":
-    - Chama `POST /auth/logout`.
-    - Limpa o carrinho ([useCart.clearCart](http://_vscodecontentref_/4)).
-    - Redireciona para a landing (`/`).
-  - Footer com navegação (Início, Pedidos, Perfil).
-
-- **Lista de Pedidos ([/orders](http://_vscodecontentref_/5))**
-  - Carrega pedidos do cliente em [GET /orders/my-orders](http://_vscodecontentref_/6).
-  - Mostra:
-    - [Pedido #<order_number>](http://_vscodecontentref_/7)
-    - Status com badge.
-    - Data do pedido.
-    - Itens em formato `2x Nome do Produto · 1x ...`.
-    - Total formatado em reais ([total_amount](http://_vscodecontentref_/8) em centavos).
-    - Forma de pagamento traduzida:
-      - `PIX` → **Pix**
-      - `CASH` → **Dinheiro**
-      - `CARD`/`CREDIT_CARD` → **Cartão**
+- **Dashboard Despacho (`/dispatcher`)**
+  - Lista pedidos com `status=READY_FOR_DELIVERY` via `GET /orders?status=READY_FOR_DELIVERY`.
+  - Exibe dados similares ao caixa (cliente, itens, pagamento, total).
+  - Ação "Concluir entrega" envia `PATCH /orders/:id/status` com `status='DELIVERED'` e recarrega.
 
 ## Autenticação e Sessão
 
 - Baseada em **cookies HttpOnly** setados pelo backend.
-- O frontend **não** usa [localStorage](http://_vscodecontentref_/9) para guardar token de autenticação.
-- Checagem de sessão sempre via `GET /users/me`.
-- Em caso de 401:
-  - Fluxos sensíveis (checkout, perfil) redirecionam para `/login`.
-  - O caminho desejado é salvo em [sessionStorage.next_path](http://_vscodecontentref_/10) para retorno após login.
+- O frontend **não** salva token de autenticação em `localStorage`.
+- O hook `useCurrentUser` chama `GET /users/me` para obter o usuário atual:
+  - Em caso de `401`, redireciona automaticamente para `/staff/login`.
+- O botão "Sair" no header do staff chama `POST /auth/logout` e volta para `/staff/login`.
 
-## Estado do Carrinho
+## Layout do Staff
 
-- Implementado com **Zustand** em [useCart.ts](http://_vscodecontentref_/11).
-- Estrutura simples:
-
-  ```ts
-  interface CartItem {
-  	productId: string;
-  	quantity: number;
-  }
-  ```
+- Todas as telas internas usam `StaffLayout`:
+  - Header com título "Sabor de Rondônia - Staff".
+  - Subtítulo contextual (ex.: "Caixa - pedidos aguardando pagamento").
+  - Exibe nome do usuário e `role` (admin/cashier/dispatcher) quando disponíveis em `/users/me`.
+  - Mostra também a rota atual e botão "Sair".

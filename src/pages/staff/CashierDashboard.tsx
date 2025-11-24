@@ -71,6 +71,32 @@ export const CashierDashboard = () => {
 
 	useEffect(() => {
 		fetchOrders();
+
+		// Conexão SSE para novos pedidos do caixa
+		const eventSource = new EventSource('/api/orders/sse/cashier');
+
+		eventSource.onmessage = (event) => {
+			try {
+				const data = JSON.parse(event.data);
+				if (!data || typeof data !== 'object') return;
+
+				// Para qualquer evento relevante, recarrega a lista
+				if (data.type && data.type !== 'CONNECTED') {
+					fetchOrders();
+				}
+			} catch {
+				// se o payload não for JSON, apenas ignora
+			}
+		};
+
+		eventSource.onerror = () => {
+			// Em caso de erro, fecha a conexão; o usuário pode atualizar a página
+			eventSource.close();
+		};
+
+		return () => {
+			eventSource.close();
+		};
 	}, []);
 
 	const handleConfirmPayment = async (orderId: string) => {

@@ -10,6 +10,7 @@ import { StaffLogin } from './pages/staff/Login';
 import { CashierDashboard } from './pages/staff/CashierDashboard';
 import { DispatcherDashboard } from './pages/staff/DispatcherDashboard';
 import { AdminDashboard } from './pages/staff/AdminDashboard';
+import { LandingStaff } from './pages/staff/LandingStaff';
 
 const ScrollToTop = () => {
 	const { pathname } = useLocation();
@@ -26,8 +27,9 @@ function App() {
 		<BrowserRouter>
 			<ScrollToTop />
 			<Routes>
-				{/* Home e login do staff */}
-				<Route path='/' element={<StaffLogin />} />
+				{/* Landing exclusiva para staff */}
+				<Route path='/' element={<LandingStaff />} />
+				{/* Login do staff */}
 				<Route path='/staff/login' element={<StaffLogin />} />
 				<Route path='/admin' element={<AdminDashboard />} />
 				<Route path='/cashier' element={<CashierDashboard />} />

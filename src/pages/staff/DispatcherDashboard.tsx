@@ -73,6 +73,31 @@ export const DispatcherDashboard = () => {
 
 	useEffect(() => {
 		fetchOrders();
+
+		// Conexão SSE para novos pedidos prontos para entrega
+		const eventSource = new EventSource('/api/orders/sse/dispatcher');
+
+		eventSource.onmessage = (event) => {
+			try {
+				const data = JSON.parse(event.data);
+				if (!data || typeof data !== 'object') return;
+
+				if (data.type && data.type !== 'CONNECTED') {
+					fetchOrders();
+				}
+			} catch {
+				// se o payload não for JSON, apenas ignora
+			}
+		};
+
+		eventSource.onerror = () => {
+			// Em caso de erro, fecha a conexão; o usuário pode atualizar a página
+			eventSource.close();
+		};
+
+		return () => {
+			eventSource.close();
+		};
 	}, []);
 
 	const handleDispatch = async (orderId: string) => {
