@@ -1,0 +1,24 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="0" y="0" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceAlpha" dx="0" dy="2" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
+      <feColorMatrix result="blurOut" in="blurOut" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.15 0" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+  </defs>
+
+  <!-- Círculo branco com leve sombra, como o Center da landing -->
+  <g filter="url(#shadow)">
+    <circle cx="32" cy="30" r="22" fill="white" />
+  </g>
+
+  <!-- Talheres na cor #2F855A (verde Chakra) -->
+  <g transform="translate(20,16)" fill="#2F855A">
+    <!-- Garfo -->
+    <path d="M4.5 0C4.22386 0 4 0.223858 4 0.5V6H3V0.5C3 0.223858 2.77614 0 2.5 0C2.22386 0 2 0.223858 2 0.5V6H1V0.5C1 0.223858 0.776142 0 0.5 0C0.223858 0 0 0.223858 0 0.5V7C0 8.38071 1.11929 9.5 2.5 9.5H3.5V20C3.5 20.8284 4.17157 21.5 5 21.5C5.82843 21.5 6.5 20.8284 6.5 20V0.5C6.5 0.223858 6.27614 0 6 0H4.5Z" />
+
+    <!-- Faca -->
+    <path d="M11 0.5C10.4477 0.5 10 0.947715 10 1.5V10C10 10.8284 10.6716 11.5 11.5 11.5H12V20C12 20.8284 12.6716 21.5 13.5 21.5C14.3284 21.5 15 20.8284 15 20V1.5C15 0.947715 14.5523 0.5 14 0.5H11Z" />
+  </g>
+</svg>
