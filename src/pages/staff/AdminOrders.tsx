@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
-	Badge,
+	Box,
 	Heading,
 	Spinner,
 	Text,
 	VStack,
 	HStack,
-	Button,
-	Box,
+	Badge,
+	Select,
 } from '@chakra-ui/react';
 import { api } from '../../lib/api';
 import { StaffLayout } from './StaffLayout';
@@ -29,20 +29,6 @@ interface Order {
 	items: OrderItem[];
 }
 
-const translatePaymentMethod = (method?: string) => {
-	switch (method) {
-		case 'PIX':
-			return 'Pix';
-		case 'CASH':
-			return 'Dinheiro';
-		case 'CREDIT_CARD':
-		case 'CARD':
-			return 'Cartão';
-		default:
-			return method || '-';
-	}
-};
-
 const formatPrice = (value: number) => {
 	return new Intl.NumberFormat('pt-BR', {
 		style: 'currency',
@@ -50,21 +36,35 @@ const formatPrice = (value: number) => {
 	}).format(value);
 };
 
-export const DispatcherDashboard = () => {
+const statusLabels: Record<string, string> = {
+	AWAITING_PAYMENT: 'Aguardando pagamento',
+	AWAITING_DISPATCH: 'Aguardando envio',
+	DELIVERED: 'Entregue',
+	CANCELLED: 'Cancelado',
+};
+
+const statusColors: Record<string, string> = {
+	AWAITING_PAYMENT: 'yellow',
+	AWAITING_DISPATCH: 'blue',
+	DELIVERED: 'green',
+	CANCELLED: 'red',
+};
+
+export const AdminOrders = () => {
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [statusFilter, setStatusFilter] = useState<string>('');
 
-	const fetchOrders = async () => {
+	const fetchOrders = async (status?: string) => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			const { data } = await api.get<Order[]>(
-				'/orders?status=AWAITING_DISPATCH'
-			);
+			const query = status ? `?status=${status}` : '';
+			const { data } = await api.get<Order[]>(`/orders${query}`);
 			setOrders(data || []);
 		} catch (err) {
-			console.error('Erro ao carregar pedidos para despacho', err);
+			console.error('Erro ao carregar pedidos para o admin', err);
 			setError('Não foi possível carregar os pedidos.');
 		} finally {
 			setIsLoading(false);
@@ -73,48 +73,35 @@ export const DispatcherDashboard = () => {
 
 	useEffect(() => {
 		fetchOrders();
-
-		// Conexão SSE para novos pedidos prontos para entrega
-		const eventSource = new EventSource('/api/orders/sse/dispatcher');
-
-		eventSource.onmessage = (event) => {
-			try {
-				const data = JSON.parse(event.data);
-				if (!data || typeof data !== 'object') return;
-
-				if (data.type && data.type !== 'CONNECTED') {
-					fetchOrders();
-				}
-			} catch {
-				// se o payload não for JSON, apenas ignora
-			}
-		};
-
-		eventSource.onerror = () => {
-			// Em caso de erro, fecha a conexão; o usuário pode atualizar a página
-			eventSource.close();
-		};
-
-		return () => {
-			eventSource.close();
-		};
 	}, []);
 
-	const handleDispatch = async (orderId: string) => {
-		try {
-			await api.patch(`/orders/${orderId}/dispatch`);
-			await fetchOrders();
-		} catch (err) {
-			console.error('Erro ao concluir entrega', err);
-			setError('Erro ao concluir entrega.');
-		}
+	const handleStatusChange = (value: string) => {
+		setStatusFilter(value);
+		fetchOrders(value || undefined);
 	};
 
 	return (
-		<StaffLayout title='Despacho - pedidos aguardando entrega'>
-			<Heading color='white' mb={6}>
-				Pedidos aguardando entrega
-			</Heading>
+		<StaffLayout title='Admin - pedidos gerais'>
+			<HStack justify='space-between' mb={4} align='center'>
+				<Heading color='white' size='md'>
+					Pedidos gerais
+				</Heading>
+				<Select
+					size='sm'
+					maxW='180px'
+					bg='gray.800'
+					borderColor='gray.700'
+					color='white'
+					value={statusFilter}
+					onChange={(e) => handleStatusChange(e.target.value)}
+				>
+					<option value=''>Todos os status</option>
+					<option value='AWAITING_PAYMENT'>Aguardando pagamento</option>
+					<option value='AWAITING_DISPATCH'>Aguardando envio</option>
+					<option value='DELIVERED'>Entregue</option>
+					<option value='CANCELLED'>Cancelado</option>
+				</Select>
+			</HStack>
 
 			{error && (
 				<Text color='red.300' mb={4}>
@@ -128,7 +115,7 @@ export const DispatcherDashboard = () => {
 					<Text color='gray.300'>Carregando pedidos...</Text>
 				</HStack>
 			) : orders.length === 0 ? (
-				<Text color='gray.400'>Nenhum pedido aguardando entrega.</Text>
+				<Text color='gray.400'>Nenhum pedido encontrado.</Text>
 			) : (
 				<VStack spacing={4} align='stretch'>
 					{orders.map((order) => (
@@ -144,7 +131,9 @@ export const DispatcherDashboard = () => {
 								<Text color='white' fontWeight='bold'>
 									Pedido #{order.order_number}
 								</Text>
-								<Badge colorScheme='blue'>Aguardando entrega</Badge>
+								<Badge colorScheme={statusColors[order.status] || 'gray'}>
+									{statusLabels[order.status] || order.status}
+								</Badge>
 							</HStack>
 
 							<Text fontSize='sm' color='gray.300' mb={1}>
@@ -160,20 +149,13 @@ export const DispatcherDashboard = () => {
 							</Text>
 
 							<Text fontSize='sm' color='gray.300' mb={1}>
-								Pagamento: {translatePaymentMethod(order.payment_method)}
+								Criado em: {new Date(order.created_at).toLocaleString('pt-BR')}
 							</Text>
 
 							<HStack justify='space-between' mt={3}>
 								<Text fontWeight='bold' color='green.300'>
 									{formatPrice((order.total_amount ?? 0) / 100)}
 								</Text>
-								<Button
-									size='sm'
-									colorScheme='blue'
-									onClick={() => handleDispatch(order.id)}
-								>
-									Concluir entrega
-								</Button>
 							</HStack>
 						</Box>
 					))}

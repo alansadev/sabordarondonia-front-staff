@@ -59,7 +59,9 @@ export const CashierDashboard = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			const { data } = await api.get<Order[]>('/orders?status=PENDING_PAYMENT');
+			const { data } = await api.get<Order[]>(
+				'/orders?status=AWAITING_PAYMENT'
+			);
 			setOrders(data || []);
 		} catch (err) {
 			console.error('Erro ao carregar pedidos para o caixa', err);
