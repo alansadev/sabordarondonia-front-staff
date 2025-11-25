@@ -92,7 +92,6 @@ export const AdminDashboard = () => {
 						</VStack>
 						<Button
 							size='sm'
-							variant='outline'
 							colorScheme='gray'
 							onClick={() => navigate('/admin/orders')}
 						>

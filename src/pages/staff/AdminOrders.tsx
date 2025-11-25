@@ -8,7 +8,9 @@ import {
 	HStack,
 	Badge,
 	Select,
+	Button,
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { StaffLayout } from './StaffLayout';
 
@@ -51,6 +53,7 @@ const statusColors: Record<string, string> = {
 };
 
 export const AdminOrders = () => {
+	const navigate = useNavigate();
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -86,9 +89,15 @@ export const AdminOrders = () => {
 				<Heading color='white' size='md'>
 					Pedidos gerais
 				</Heading>
+				<Button size='sm' variant='outline' onClick={() => navigate('/admin')}>
+					Voltar
+				</Button>
+			</HStack>
+
+			<HStack justify='flex-end' mb={3}>
 				<Select
 					size='sm'
-					maxW='180px'
+					maxW='220px'
 					bg='gray.800'
 					borderColor='gray.700'
 					color='white'

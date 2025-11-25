@@ -8,7 +8,7 @@ import {
 	Text,
 	HStack,
 } from '@chakra-ui/react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { api } from '../../lib/api';
 
@@ -19,7 +19,6 @@ interface StaffLayoutProps {
 
 export const StaffLayout = ({ title, children }: StaffLayoutProps) => {
 	const navigate = useNavigate();
-	const location = useLocation();
 	const { data: user, isLoading } = useCurrentUser();
 
 	const handleLogout = async () => {
@@ -31,8 +30,6 @@ export const StaffLayout = ({ title, children }: StaffLayoutProps) => {
 			navigate('/login');
 		}
 	};
-
-	const pathname = location.pathname;
 
 	if (isLoading) {
 		return (
@@ -78,9 +75,6 @@ export const StaffLayout = ({ title, children }: StaffLayoutProps) => {
 										: ''}
 								</Text>
 							)}
-							<Text fontSize='xs' color='gray.500'>
-								Rota: {pathname}
-							</Text>
 						</Box>
 						<Button
 							size='sm'
@@ -92,8 +86,18 @@ export const StaffLayout = ({ title, children }: StaffLayoutProps) => {
 						</Button>
 					</HStack>
 				</Flex>
-
-				{children}
+				<Box
+					as='main'
+					bg='gray.800'
+					borderRadius='lg'
+					borderWidth='1px'
+					borderColor='gray.700'
+					p={4}
+					maxH='calc(100vh - 120px)'
+					overflowY='auto'
+				>
+					{children}
+				</Box>
 			</Container>
 		</Box>
 	);

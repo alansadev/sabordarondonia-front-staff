@@ -11,6 +11,8 @@ import { CashierDashboard } from './pages/staff/CashierDashboard';
 import { DispatcherDashboard } from './pages/staff/DispatcherDashboard';
 import { AdminDashboard } from './pages/staff/AdminDashboard';
 import { AdminOrders } from './pages/staff/AdminOrders';
+import { AdminProducts } from './pages/staff/AdminProducts';
+import { AdminUsers } from './pages/staff/AdminUsers';
 import { LandingStaff } from './pages/staff/LandingStaff';
 
 const ScrollToTop = () => {
@@ -34,6 +36,8 @@ function App() {
 				<Route path='/login' element={<StaffLogin />} />
 				<Route path='/admin' element={<AdminDashboard />} />
 				<Route path='/admin/orders' element={<AdminOrders />} />
+				<Route path='/admin/products' element={<AdminProducts />} />
+				<Route path='/admin/users' element={<AdminUsers />} />
 				<Route path='/cashier' element={<CashierDashboard />} />
 				<Route path='/dispatcher' element={<DispatcherDashboard />} />
 

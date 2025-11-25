@@ -113,10 +113,12 @@ export const CashierDashboard = () => {
 
 	return (
 		<StaffLayout title='Caixa - pedidos aguardando pagamento'>
-			<Heading color='white' mb={6}>
+			<Heading color='white' size='md' mb={1}>
 				Pedidos aguardando pagamento
 			</Heading>
-
+			<Text fontSize='xs' color='gray.400' mb={4}>
+				Veja e confirme rapidamente os pagamentos recebidos no balcão.
+			</Text>
 			{error && (
 				<Text color='red.300' mb={4}>
 					{error}
@@ -135,42 +137,71 @@ export const CashierDashboard = () => {
 					{orders.map((order) => (
 						<Box
 							key={order.id}
-							bg='gray.800'
+							bg='gray.900'
 							borderRadius='lg'
 							p={4}
 							borderWidth='1px'
 							borderColor='gray.700'
 						>
-							<HStack justify='space-between' mb={2}>
-								<Text color='white' fontWeight='bold'>
-									Pedido #{order.order_number}
-								</Text>
-								<Badge colorScheme='yellow'>Aguardando pagamento</Badge>
+							<HStack justify='space-between' mb={1}>
+								<VStack spacing={0} align='flex-start'>
+									<Text color='white' fontWeight='bold'>
+										Pedido #{order.order_number}
+									</Text>
+									<Text fontSize='xs' color='gray.400'>
+										Criado em:{' '}
+										{new Date(order.created_at).toLocaleTimeString('pt-BR', {
+											hour: '2-digit',
+											minute: '2-digit',
+										})}
+									</Text>
+								</VStack>
+								<Badge colorScheme='yellow' variant='subtle'>
+									Aguardando pagamento
+								</Badge>
 							</HStack>
 
-							<Text fontSize='sm' color='gray.300' mb={1}>
-								Cliente: {order.client_name || '-'} ({order.client_phone || '-'}
-								)
-							</Text>
+							<Box mt={3} mb={3}>
+								<Text fontSize='sm' color='gray.300' mb={1}>
+									Cliente:{' '}
+									<Text as='span' fontWeight='medium' color='white'>
+										{order.client_name || '-'}
+									</Text>{' '}
+									<Text as='span' color='gray.400' fontSize='xs'>
+										({order.client_phone || '-'})
+									</Text>
+								</Text>
 
-							<Text fontSize='sm' color='gray.300' mb={1}>
-								Itens:{' '}
-								{order.items
-									.map((i) => `${i.quantity}x ${i.product_name}`)
-									.join(' · ')}
-							</Text>
+								<Text fontSize='sm' color='gray.300' mb={1}>
+									Itens:
+								</Text>
+								<Text fontSize='sm' color='gray.200'>
+									{order.items
+										.map((i) => `${i.quantity}x ${i.product_name}`)
+										.join(' · ')}
+								</Text>
 
-							<Text fontSize='sm' color='gray.300' mb={1}>
-								Pagamento: {translatePaymentMethod(order.payment_method)}
-							</Text>
+								<Text fontSize='sm' color='gray.300' mt={2}>
+									Pagamento:{' '}
+									<Text as='span' fontWeight='medium' color='green.200'>
+										{translatePaymentMethod(order.payment_method)}
+									</Text>
+								</Text>
+							</Box>
 
-							<HStack justify='space-between' mt={3}>
-								<Text fontWeight='bold' color='green.300'>
+							<HStack
+								justify='space-between'
+								pt={2}
+								borderTop='1px'
+								borderColor='gray.700'
+							>
+								<Text fontWeight='bold' color='green.300' fontSize='lg'>
 									{formatPrice((order.total_amount ?? 0) / 100)}
 								</Text>
 								<Button
 									size='sm'
 									colorScheme='green'
+									w='full'
 									onClick={() => handleConfirmPayment(order.id)}
 								>
 									Confirmar pagamento
