@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 
 export interface CurrentUser {
@@ -9,7 +11,9 @@ export interface CurrentUser {
 }
 
 export const useCurrentUser = () => {
-	return useQuery({
+	const navigate = useNavigate();
+
+	const query = useQuery({
 		queryKey: ['current-user'],
 		queryFn: async () => {
 			const { data } = await api.get<CurrentUser>('/users/me');
@@ -17,4 +21,12 @@ export const useCurrentUser = () => {
 		},
 		retry: false,
 	});
+
+	useEffect(() => {
+		if (query.isError) {
+			navigate('/login');
+		}
+	}, [query.isError, navigate]);
+
+	return query;
 };
