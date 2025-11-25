@@ -72,7 +72,8 @@ export const AdminProducts = () => {
 
 	const handleSubmit = async () => {
 		try {
-			const priceNumber = Number(price.replace(',', '.'));
+			const normalized = price.replace(/\D/g, '');
+			const priceNumber = Number(normalized) / 100;
 			const stockNumber = stock ? Number(stock) : undefined;
 			if (!name || !category || Number.isNaN(priceNumber)) {
 				setError('Preencha nome, categoria e um preço válido.');
@@ -111,7 +112,8 @@ export const AdminProducts = () => {
 	const handleEdit = (product: Product) => {
 		setEditingId(product.id);
 		setName(product.name);
-		setPrice(product.price.toString().replace('.', ','));
+		// product.price vem em centavos; convertemos para formato "0,00"
+		setPrice((product.price / 100).toFixed(2).replace('.', ','));
 		setStock(product.stock ? String(product.stock) : '');
 		setCategory(product.category ?? '');
 	};
@@ -195,7 +197,15 @@ export const AdminProducts = () => {
 						<FormLabel color='gray.200'>Preço (R$)</FormLabel>
 						<Input
 							value={price}
-							onChange={(e) => setPrice(e.target.value)}
+							onChange={(e) => {
+								const digits = e.target.value.replace(/\D/g, '');
+								if (!digits) {
+									setPrice('');
+									return;
+								}
+								const numberValue = Number(digits) / 100;
+								setPrice(numberValue.toFixed(2).replace('.', ','));
+							}}
 							placeholder='0,00'
 							bg='gray.900'
 							borderColor='gray.700'
@@ -282,7 +292,7 @@ export const AdminProducts = () => {
 							</HStack>
 							<HStack justify='space-between'>
 								<Text color='green.300' fontSize='sm'>
-									{formatPrice(product.price ?? 0)}
+									{formatPrice((product.price ?? 0) / 100)}
 								</Text>
 								<Button
 									size='xs'

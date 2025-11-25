@@ -26,6 +26,7 @@ interface Order {
 	payment_method?: string;
 	client_name?: string;
 	client_phone?: string;
+	changeFor?: number;
 	items: OrderItem[];
 }
 
@@ -189,24 +190,45 @@ export const CashierDashboard = () => {
 								</Text>
 							</Box>
 
-							<HStack
-								justify='space-between'
-								pt={2}
-								borderTop='1px'
-								borderColor='gray.700'
-							>
-								<Text fontWeight='bold' color='green.300' fontSize='lg'>
-									{formatPrice((order.total_amount ?? 0) / 100)}
-								</Text>
+							<Box mt={3} pt={2} borderTop='1px' borderColor='gray.700'>
+								<HStack justify='space-between' mb={1}>
+									<Text fontWeight='bold' color='green.300' fontSize='lg'>
+										Total: {formatPrice((order.total_amount ?? 0) / 100)}
+									</Text>
+								</HStack>
+
+								{order.payment_method === 'CASH' && order.changeFor != null && (
+									<>
+										<Text fontSize='sm' color='gray.300'>
+											Troco para:{' '}
+											<Text as='span' fontWeight='medium' color='yellow.200'>
+												{formatPrice(order.changeFor / 100)}
+											</Text>
+										</Text>
+										<Text fontSize='sm' color='gray.300'>
+											Troco:{' '}
+											<Text as='span' fontWeight='medium' color='green.300'>
+												{formatPrice(
+													Math.max(
+														order.changeFor - (order.total_amount ?? 0),
+														0
+													) / 100
+												)}
+											</Text>
+										</Text>
+									</>
+								)}
+
 								<Button
 									size='sm'
 									colorScheme='green'
 									w='full'
+									mt={3}
 									onClick={() => handleConfirmPayment(order.id)}
 								>
 									Confirmar pagamento
 								</Button>
-							</HStack>
+							</Box>
 						</Box>
 					))}
 				</VStack>
