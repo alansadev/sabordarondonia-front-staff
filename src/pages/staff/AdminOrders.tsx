@@ -89,7 +89,12 @@ export const AdminOrders = () => {
 				<Heading color='white' size='md'>
 					Pedidos gerais
 				</Heading>
-				<Button size='sm' variant='outline' onClick={() => navigate('/admin')}>
+				<Button
+					size='sm'
+					colorScheme='blue'
+					variant='solid'
+					onClick={() => navigate('/admin')}
+				>
 					Voltar
 				</Button>
 			</HStack>

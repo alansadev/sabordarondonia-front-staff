@@ -20,6 +20,7 @@ interface Product {
 	id: string;
 	name: string;
 	price: number;
+	category?: string;
 	stock?: number;
 	is_active?: boolean;
 }
@@ -39,6 +40,7 @@ export const AdminProducts = () => {
 	const [name, setName] = useState('');
 	const [price, setPrice] = useState('');
 	const [stock, setStock] = useState('');
+	const [category, setCategory] = useState('');
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [activeFilter, setActiveFilter] = useState<string>('all');
 
@@ -64,6 +66,7 @@ export const AdminProducts = () => {
 		setName('');
 		setPrice('');
 		setStock('');
+		setCategory('');
 		setEditingId(null);
 	};
 
@@ -71,13 +74,14 @@ export const AdminProducts = () => {
 		try {
 			const priceNumber = Number(price.replace(',', '.'));
 			const stockNumber = stock ? Number(stock) : undefined;
-			if (!name || Number.isNaN(priceNumber)) {
-				setError('Preencha nome e preço válidos.');
+			if (!name || !category || Number.isNaN(priceNumber)) {
+				setError('Preencha nome, categoria e um preço válido.');
 				return;
 			}
 
 			const formData = new FormData();
 			formData.append('name', name);
+			formData.append('category', category);
 			formData.append('price', String(priceNumber));
 			if (stockNumber !== undefined && !Number.isNaN(stockNumber)) {
 				formData.append('stock', String(stockNumber));
@@ -109,6 +113,7 @@ export const AdminProducts = () => {
 		setName(product.name);
 		setPrice(product.price.toString().replace('.', ','));
 		setStock(product.stock ? String(product.stock) : '');
+		setCategory(product.category ?? '');
 	};
 
 	const handleToggleActive = async (product: Product) => {
@@ -135,7 +140,12 @@ export const AdminProducts = () => {
 				<Heading color='white' size='md'>
 					Produtos
 				</Heading>
-				<Button size='sm' variant='outline' onClick={() => navigate('/admin')}>
+				<Button
+					size='sm'
+					colorScheme='blue'
+					variant='solid'
+					onClick={() => navigate('/admin')}
+				>
 					Voltar
 				</Button>
 			</HStack>
@@ -161,6 +171,19 @@ export const AdminProducts = () => {
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							placeholder='Nome do produto'
+							bg='gray.900'
+							borderColor='gray.700'
+							color='white'
+							size='sm'
+						/>
+					</FormControl>
+
+					<FormControl>
+						<FormLabel color='gray.200'>Categoria</FormLabel>
+						<Input
+							value={category}
+							onChange={(e) => setCategory(e.target.value)}
+							placeholder='Ex: Lanche, Bebida...'
 							bg='gray.900'
 							borderColor='gray.700'
 							color='white'

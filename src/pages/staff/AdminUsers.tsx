@@ -34,6 +34,7 @@ export const AdminUsers = () => {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [phone, setPhone] = useState('');
 	const [role, setRole] = useState<string>('ADMIN');
 
 	const fetchUsers = async () => {
@@ -63,8 +64,10 @@ export const AdminUsers = () => {
 
 	const handleCreateUser = async () => {
 		try {
-			if (!name || !email || !password) {
-				setError('Preencha nome, email e senha.');
+			const numericPhone = phone.replace(/\D/g, '');
+
+			if (!name || !email || !password || !numericPhone) {
+				setError('Preencha nome, email, telefone e senha.');
 				return;
 			}
 
@@ -72,6 +75,7 @@ export const AdminUsers = () => {
 				name,
 				email,
 				password,
+				phone: numericPhone,
 				roles: [role],
 			});
 
@@ -107,7 +111,12 @@ export const AdminUsers = () => {
 				<Heading color='white' size='md'>
 					Usuários
 				</Heading>
-				<Button size='sm' variant='outline' onClick={() => navigate('/admin')}>
+				<Button
+					size='sm'
+					colorScheme='blue'
+					variant='solid'
+					onClick={() => navigate('/admin')}
+				>
 					Voltar
 				</Button>
 			</HStack>
@@ -133,6 +142,19 @@ export const AdminUsers = () => {
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							placeholder='Nome do usuário'
+							bg='gray.900'
+							borderColor='gray.700'
+							color='white'
+							size='sm'
+						/>
+					</FormControl>
+
+					<FormControl>
+						<FormLabel color='gray.200'>Telefone</FormLabel>
+						<Input
+							value={phone}
+							onChange={(e) => setPhone(e.target.value)}
+							placeholder='(69) 99999-9999'
 							bg='gray.900'
 							borderColor='gray.700'
 							color='white'
